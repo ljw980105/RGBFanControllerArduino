@@ -1,7 +1,3 @@
-// color swirl! connect an RGB LED to the PWM pins as indicated
-// in the #defines
-// public domain, enjoy!
-
 #define REDPIN 5
 #define GREENPIN 6
 #define BLUEPIN 3
@@ -11,14 +7,17 @@
 
 #include "RGBController.h"
 #include <SoftwareSerial.h>
+#include <stdlib.h>
 
 RGBController controller(REDPIN, GREENPIN, BLUEPIN);
+// note that these 2 pins need to be switched when connected to the Arduino
 SoftwareSerial ble(rxPin, txPin);
 
 #pragma mark - function prototypes
 
 void rainbow();
-void setColor(char command);
+void setColor();
+CONTROL_MODE currentMode = CONTROL_MODE_RAINBOW;
 
 #pragma mark - arduino methods
 
@@ -26,24 +25,32 @@ void setup() {
     pinMode(rxPin, INPUT);
     pinMode(txPin, OUTPUT);
     ble.begin(9600);
-
-    controller.setColor(100, 100, 100);
 }
 
 
 void loop() {
     rainbow();
-//    if (ble.available()) {
-//        char data = ble.read();
-//        setColor(data);
-//        Serial.println("data received " + data);
-//        
-//    }
+    /*
+    if (ble.available()) {
+        char data = ble.read();
+        if (atoi(&data) == CONTROL_MODE_STATIC) {
+            currentMode = CONTROL_MODE_STATIC;
+        } else if (atoi(&data) == CONTROL_MODE_RAINBOW) {
+            currentMode = CONTROL_MODE_RAINBOW;
+        }
+    }
+
+    if (currentMode == CONTROL_MODE_RAINBOW) {
+        rainbow();
+    } else if (currentMode == CONTROL_MODE_STATIC) {
+        setColor();
+    }
+     */
 }
 
 #pragma mark - additional methods
 
-void setColor(char command) {
+void setColor() {
     char obtainedColor[3];
     ble.readBytes(obtainedColor, 3);
     controller.setColor(int(obtainedColor[0]),int(obtainedColor[1]),int(obtainedColor[2]));

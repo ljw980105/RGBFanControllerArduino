@@ -7,6 +7,11 @@
 
 #include <Arduino.h>
 
+typedef enum {
+    CONTROL_MODE_STATIC,
+    CONTROL_MODE_RAINBOW
+} CONTROL_MODE;
+
 class RGBController {
 public:
     RGBController(int redPin, int greenPin, int bluePin);
