@@ -16,8 +16,8 @@ SoftwareSerial ble(rxPin, txPin);
 #pragma mark - function prototypes
 
 void rainbow();
-void setColor();
-CONTROL_MODE currentMode = CONTROL_MODE_RAINBOW;
+void staticColorWithBLE();
+void triColorMode();
 
 #pragma mark - arduino methods
 
@@ -25,35 +25,67 @@ void setup() {
     pinMode(rxPin, INPUT);
     pinMode(txPin, OUTPUT);
     ble.begin(9600);
+    Serial.begin(9600);
 }
 
 
 void loop() {
-    rainbow();
-    /*
-    if (ble.available()) {
-        char data = ble.read();
-        if (atoi(&data) == CONTROL_MODE_STATIC) {
-            currentMode = CONTROL_MODE_STATIC;
-        } else if (atoi(&data) == CONTROL_MODE_RAINBOW) {
-            currentMode = CONTROL_MODE_RAINBOW;
-        }
-    }
-
-    if (currentMode == CONTROL_MODE_RAINBOW) {
-        rainbow();
-    } else if (currentMode == CONTROL_MODE_STATIC) {
-        setColor();
-    }
-     */
+    //rainbow();
+    //staticColorWithBLE();
+    triColorMode();
 }
 
 #pragma mark - additional methods
 
-void setColor() {
-    char obtainedColor[3];
-    ble.readBytes(obtainedColor, 3);
-    controller.setColor(int(obtainedColor[0]),int(obtainedColor[1]),int(obtainedColor[2]));
+void staticColorWithBLE() {
+    if (ble.available()) {
+        char data = ble.read();
+        if (atoi(&data) == CONTROL_MODE_STATIC) {
+            char obtainedColor[3];
+            ble.readBytes(obtainedColor, 3);
+            controller.setColor(int(obtainedColor[0]),int(obtainedColor[1]),int(obtainedColor[2]));
+        }
+    }
+}
+
+// orange : 253 57 1
+// pink 246 10 38
+// mint green: 105 255 19
+void triColorMode() {
+    int r = 253;
+    int g = 57;
+    int b = 1;
+    controller.setColor(r, g, b); // orange
+
+    // change to pink (246, 10, 38)
+    while(g > 10) {
+        g --;
+        if (r > 246) r --;
+        if (b < 38) b ++;
+        controller.setColor(r, g, b);
+        delay(FADESPEED);
+    }
+    delay(2000);
+
+    // change to mint green (105, 255 ,19)
+    while (g < 254) {
+        g += 2;
+        if (r > 105) r --;
+        if (b > 19) b --;
+        controller.setColor(r, g, b);
+        delay(FADESPEED);
+    }
+    delay(2000);
+
+    // change back to orange
+    while(g > 57) {
+        g --;
+        if (r < 253) r ++;
+        if (b < 19) b ++;
+        controller.setColor(r, g, b);
+        delay(FADESPEED);
+    }
+    delay(2000);
 }
 
 void rainbow() {
