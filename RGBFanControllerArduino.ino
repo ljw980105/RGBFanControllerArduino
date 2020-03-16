@@ -26,13 +26,14 @@ void setup() {
     pinMode(txPin, OUTPUT);
     ble.begin(9600);
     Serial.begin(9600);
+    controller.setSavedColor();
 }
 
 
 void loop() {
     //rainbow();
-    //staticColorWithBLE();
-    triColorMode();
+    staticColorWithBLE();
+    //triColorMode();
 }
 
 #pragma mark - additional methods
@@ -44,6 +45,7 @@ void staticColorWithBLE() {
             char obtainedColor[3];
             ble.readBytes(obtainedColor, 3);
             controller.setColor(int(obtainedColor[0]),int(obtainedColor[1]),int(obtainedColor[2]));
+            controller.saveColor(int(obtainedColor[0]), int(obtainedColor[1]), int(obtainedColor[2]));
         }
     }
 }

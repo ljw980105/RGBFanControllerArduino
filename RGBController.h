@@ -6,6 +6,7 @@
 #define RGBFANCONTROLLERARDUINO_RGBCONTROLLER_H
 
 #include <Arduino.h>
+#include <EEPROM.h>
 
 typedef enum {
     CONTROL_MODE_STATIC,
@@ -16,6 +17,8 @@ class RGBController {
 public:
     RGBController(int redPin, int greenPin, int bluePin);
     void setColor(int r, int g, int b);
+    void saveColor(int r, int g, int b);
+    void setSavedColor();
 private:
     int redPin;
     int greenPin;

@@ -18,3 +18,13 @@ void RGBController::setColor(int r, int g, int b) {
     analogWrite(greenPin, g);
     analogWrite(bluePin, b);
 }
+
+void RGBController::saveColor(int r, int g, int b) {
+    EEPROM.write(0, r);
+    EEPROM.write(1, g);
+    EEPROM.write(2, b);
+}
+
+void RGBController::setSavedColor() {
+    setColor(EEPROM.read(0), EEPROM.read(1), EEPROM.read(2));
+}
