@@ -3,7 +3,10 @@
 #define BLUEPIN 3
 #define txPin 11
 #define rxPin 10
-#define FADESPEED 25     // make this higher to slow down
+#define FADESPEED 10     // make this higher to slow down
+#define FADESPEED_BREATHE 4
+#define MID_DELAY 2200
+#define END_DELAY 1000
 
 #include "RGBController.h"
 #include <SoftwareSerial.h>
@@ -18,6 +21,10 @@ SoftwareSerial ble(rxPin, txPin);
 void rainbow();
 void staticColorWithBLE();
 void triColorMode();
+void rainbow_breathe();
+void dualColorBreathe();
+// utilities
+void fadeInOutWithColor(int r, int g, int b);
 
 #pragma mark - arduino methods
 
@@ -32,8 +39,10 @@ void setup() {
 
 void loop() {
     //rainbow();
-    staticColorWithBLE();
+    //staticColorWithBLE();
     //triColorMode();
+//    rainbow_breathe();
+    dualColorBreathe();
 }
 
 #pragma mark - additional methods
@@ -123,4 +132,48 @@ void rainbow() {
         analogWrite(GREENPIN, g);
         delay(FADESPEED);
     }
+}
+
+void rainbow_breathe() {
+    fadeInOutWithColor(255, 17, 17); // red
+    fadeInOutWithColor(255, 56, 0); // orange
+    fadeInOutWithColor(255, 51, 22); // yellow
+    fadeInOutWithColor(25, 255, 56); // mint green
+    fadeInOutWithColor(0, 255, 255); // cyan blue
+    fadeInOutWithColor(155, 11, 255); // purple
+    fadeInOutWithColor(255, 255, 255); // white
+}
+
+void fadeInOutWithColor(int r, int g, int b) {
+    RgbColor rgb;
+    rgb.r = r;
+    rgb.g = g;
+    rgb.b = b;
+    HsvColor hsv = controller.RgbToHsv(rgb);
+    int h = hsv.h;
+    int s = hsv.s;
+    int v = 0;
+    while (v < hsv.v) {
+        v ++;
+        controller.setHSVColor(h, s, v);
+        delay(FADESPEED_BREATHE);
+        HsvColor hsv2;
+        hsv2.h = h;
+        hsv2.s = s;
+        hsv2.v = v;
+    }
+    delay(MID_DELAY);
+    while (v > 0) {
+        v --;
+        controller.setHSVColor(h, s, v);
+        delay(FADESPEED_BREATHE);
+    }
+    delay(END_DELAY);
+}
+
+void dualColorBreathe() {
+    // red
+    fadeInOutWithColor(255, 17, 17);
+    // orange
+    fadeInOutWithColor(255, 56, 0);
 }
